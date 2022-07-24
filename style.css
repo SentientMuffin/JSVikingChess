@@ -89,6 +89,36 @@ div * {
   max-height: 100%;
 }
 
+.selected {
+  background-color: cornflowerblue !important;
+}
+
+.traversable {
+  background-color: aquamarine !important;
+}
+
+.vikingsUnit {
+  background-color: gold;
+}
+
+.kingsUnit {
+  background-color: greenyellow;
+}
+
+.kingUnit {
+  background-color: green;
+}
+
+.nonTurnUnits {
+  pointer-events: none;
+  background: gray;
+}
+
+.turnUnits {
+  border-color: darkred;
+  border-width: 4px;
+}
+
 .gamecell:not(.escapeZone):hover {
   color: #fff;
   background: rgba(37, 88, 228, 0.712);
