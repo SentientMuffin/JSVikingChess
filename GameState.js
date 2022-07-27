@@ -15,6 +15,7 @@ class GameState {
       } 
     }; 
     this.King = null;
+    this.KingClassName = 'kingUnit';
     this.EscapeZones = [];
     this.Selection = { Selected: false, Unit: null };
   }
@@ -127,13 +128,23 @@ class GameState {
   }
 
   checkVikingWinCondition() {
-    // let kingLocation = this.King.getLocationXY;
-    // TODO implement win condition
-    return false; 
+    let x = this.King.getLocationXY()[0];
+    let y = this.King.getLocationXY()[1];
+    let surroundCount = 0;
+
+    if (x === 1 || x === SETTINGS.boardWidth || y === 1 || y === SETTINGS.boardHeight) {
+      surroundCount++;
+    }
+    
+    if (typeMatch([x, y - 1], this.SIDES.Vikings)) surroundCount++;
+    if (typeMatch([x, y + 1], this.SIDES.Vikings)) surroundCount++;
+    if (typeMatch([x - 1, y], this.SIDES.Vikings)) surroundCount++;
+    if (typeMatch([x + 1, y], this.SIDES.Vikings)) surroundCount++;
+
+    return surroundCount == 4; 
   }
 
   checkKingWinCondition() {
-    // debugger;
     if (typeMatch($(this.King.getLocationXY()), EscapeZone)) {
       return true;
     }
@@ -153,5 +164,4 @@ class GameState {
       // TODO: implement game reset and win text
     }
   }
-
 }

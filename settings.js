@@ -27,6 +27,8 @@ const vikingSideInitialLocation = [
 ];
 
 const SETTINGS = {
+  boardWidth: boardWidth,
+  boardHeight: boardHeight,
   escapeZone: escapeZone,
   kingInitialLocation: kingInitialLocation,
   kingSideInitialLocation: kingSideInitialLocation,

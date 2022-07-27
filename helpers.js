@@ -22,7 +22,8 @@ function clickEvent(event) {
 function moveEvent(event) {
   let unit = gameState.Selection.Unit;
   unit.moveTo(event.currentTarget.id);
-  checkCapture(unit);
+
+  if (!unit.isKing) checkCapture(unit);
 
   // Update Turn
   gameState.endTurn();
@@ -33,6 +34,7 @@ function checkCapture(unit) {
   let x = unit.getLocationXY()[0];
   let y = unit.getLocationXY()[1];
   let unitCaptured = false; 
+
   // check Up
   unitCaptured = unitCaptured || checkCaptureForDirection(x, 0, y - 1, -1);
   
