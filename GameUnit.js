@@ -36,8 +36,11 @@ class GameUnit {
 
     // Move unit background
     let classList = $(this.locationId).attr('class');
-    $(this.locationId).attr('class', 'gamecell');
-    $('#' + newLocationId).attr('class', classList);
+    // $(this.locationId).attr('class', 'gamecell');
+    gameState.resetGameCell(this.locationId);
+    for (let c of classList.split(" ")) {
+      $('#' + newLocationId).addClass(c);
+    }
 
     this.locationId = '#' + newLocationId;
     highLightTraversable(this, false);
@@ -45,7 +48,8 @@ class GameUnit {
   }
 
   release() {
-    $(this.locationId).attr('class', 'gamecell');
+    // $(this.locationId).attr('class', 'gamecell');
+    gameState.resetGameCell(this.locationId);
     $(this.locationId).find('.gamepiece').remove();
   }
 

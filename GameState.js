@@ -3,38 +3,41 @@ class GameState {
     this.turn = null;
     this.nonTurn = null;
     this.SIDES = { 
-      Vikings: { id: 'v', Units: [], className: 'vikingsUnit' }, 
-      Kings: { id: 'k', Units: [], className: 'kingsUnit' } 
+      Vikings: { 
+        id: 'v', 
+        Units: [], 
+        className: 'vikingsUnit'
+      }, 
+      Kings: { 
+        id: 'k', 
+        Units: [], 
+        className: 'kingsUnit'
+      } 
     }; 
-    // this.VikingUnits = [];
-    // this.KingUnits = [];
     this.King = null;
-    // this.King = new GameUnit();
     this.EscapeZones = [];
     this.Selection = { Selected: false, Unit: null };
-
-    // this.placePieces();
   }
 
   placePieces() {
     // King side
-    let kingLocation = this.placePiece(kingInitialLocation, 'king.svg');
+    let kingLocation = this.placePiece(SETTINGS.kingInitialLocation, 'king.svg');
     this.King = new GameUnit(this.SIDES.Kings.id, kingLocation, true);
     this.SIDES.Kings.Units.push(this.King);
 
-    for(let loc of kingSideInitialLocation) {
+    for(let loc of SETTINGS.kingSideInitialLocation) {
       let unitLocation = this.placePiece(loc, 'knight.svg');
       this.SIDES.Kings.Units.push(new GameUnit(this.SIDES.Kings.id, unitLocation));
     } 
 
     // Viking side
-    for (let loc of vikingSideInitialLocation) {
+    for (let loc of SETTINGS.vikingSideInitialLocation) {
       let unitLocation = this.placePiece(loc, 'viking.svg');
       this.SIDES.Vikings.Units.push(new GameUnit(this.SIDES.Vikings.id, unitLocation));
     }
 
     // Escape zone
-    for (let loc of escapeZone) {
+    for (let loc of SETTINGS.escapeZone) {
       let zoneLocation = markEscapeZone(loc);
       this.EscapeZones.push(new EscapeZone(zoneLocation));
     }
@@ -50,10 +53,16 @@ class GameState {
     return id;
   }
 
+  resetGameCell(locationId) {
+    $(locationId).attr('class', 'gamecell');
+
+    // check for locationId in EscapeZone
+    if (EscapeZone.isEscapeZone(locationId)) {
+      $(locationId).addClass(EscapeZone.className);
+    }
+  }
+
   refreshBoard() {
-    // let nonTurnUnits = this.turn === SIDES.Vikings? KingUnits : VikingUnits; 
-    // let turnUnits = this.turn === SIDES.Vikings? VikingUnits : KingUnits;
-    
     // Disable all non turn units
     for (let unit of this.nonTurn.Units) {
       unit.updateGrid();
@@ -113,31 +122,36 @@ class GameState {
   }
 
   endTurn() {
-    this.checkWinCondition();
+    this.checkWinConditionSatisfied();
     this.nextTurn();
   }
 
   checkVikingWinCondition() {
-    let kingLocation = this.King.getLocationXY;
+    // let kingLocation = this.King.getLocationXY;
     // TODO implement win condition
+    return false; 
   }
 
   checkKingWinCondition() {
-    // TODO implement win condition
+    // debugger;
+    if (typeMatch($(this.King.getLocationXY()), EscapeZone)) {
+      return true;
+    }
+    return false;
   }
-
-  checkWinCondition() {
-    let win = false;
-    // this.turn.checkWinCondition();
-    // if (this.turn === SIDES.Vikings) {
-    //   win = this.checkVikingWinCondition();
-    // } else {
-    //   win = this.checkKingWinCondition();
-    // }
+  
+  checkWinConditionSatisfied() {
+    let win = null;
+    if (this.turn === this.SIDES.Vikings) {
+      win = this.checkVikingWinCondition();
+    } else {
+      win = this.checkKingWinCondition();
+    }
 
     if (win) {
       console.log("Win condition reached!");
       // TODO: implement game reset and win text
     }
   }
+
 }

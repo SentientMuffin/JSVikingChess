@@ -26,6 +26,13 @@ const vikingSideInitialLocation = [
   [4, boardHeight], [5, boardHeight], [6, boardHeight], [7, boardHeight], [8, boardHeight], [6, boardHeight - 1]
 ];
 
+const SETTINGS = {
+  escapeZone: escapeZone,
+  kingInitialLocation: kingInitialLocation,
+  kingSideInitialLocation: kingSideInitialLocation,
+  vikingSideInitialLocation: vikingSideInitialLocation
+}
+
 // ========================= END ============================
 
 // module.exports = [

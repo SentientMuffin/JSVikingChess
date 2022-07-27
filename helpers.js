@@ -1,6 +1,6 @@
 function markEscapeZone(location) {
   let id = locationToID(location);
-  $(id).addClass('escapeZone');
+  $(id).addClass(EscapeZone.className);
   return id;
 }
 
@@ -32,42 +32,50 @@ function checkCapture(unit) {
   // check for captures as a result of the update of unit: GameUnit
   let x = unit.getLocationXY()[0];
   let y = unit.getLocationXY()[1];
-  
+  let unitCaptured = false; 
   // check Up
-  checkCaptureForDirection(x, 0, y - 1, -1);
+  unitCaptured = unitCaptured || checkCaptureForDirection(x, 0, y - 1, -1);
   
   // check Down
-  checkCaptureForDirection(x, 0, y + 1, 1);
+  unitCaptured = unitCaptured || checkCaptureForDirection(x, 0, y + 1, 1);
 
   // check Left
-  checkCaptureForDirection(x - 1, -1, y, 0);
+  unitCaptured = unitCaptured || checkCaptureForDirection(x - 1, -1, y, 0);
 
   // check Right
-  checkCaptureForDirection(x + 1, +1, y, 0);
+  unitCaptured = unitCaptured || checkCaptureForDirection(x + 1, +1, y, 0);
+
+  if (unitCaptured) {
+    console.log("Unit captured!");
+  } else {
+    console.log('No captures for unit at: [' + x + ', ' + y + ']');
+  }
+}
+
+function typeMatch(location, type) {
+  return $(locationToID(location))?.hasClass(type.className);
 }
 
 function checkCaptureForDirection(x, xChange, y, yChange) {
   // start with [x, y] , if there is a unit of opposite side, continue checking
   let capture = gameState.nonTurn;
   let finisher = gameState.turn
-  let captured = [];
+  let captured = null;
 
-  while ($(locationToID(x, y)).hasClass(capture.className)) {
-    captured.push(locationToID(x, y));
+  if (typeMatch([x, y], capture)) {
+    captured = locationToID(x, y);
     x += xChange;
     y += yChange;
   }
 
-  if (captured.length == 0) {
-    console.log('No captures in the direction: [' + xChange + ', ' + yChange + ']');
-    return;
+  if (!captured) return false;
+  
+  // if captured exist, x,y would have been incremented to when it is not sideToCapture
+  if (typeMatch([x, y], finisher) || typeMatch([x, y], EscapeZone)) {
+    gameState.releaseUnit(captured, capture);
+    return true;
   }
-  // if captured is at least 1, x,y would have been incremented to when it is not sideToCapture
-  if ($(locationToID(x, y))?.hasClass(finisher.className)) {
-    for (let unit of captured) {
-      gameState.releaseUnit(unit, capture);
-    }
-  }
+  return false;
 }
 
 function highLightTraversable(unit, highLight = true) {
