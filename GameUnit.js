@@ -65,4 +65,9 @@ class GameUnit {
       $(this.locationId).off('click');
     }
   }
+
+  disable() {
+    $(this.locationId).addClass('nonTurnUnits');
+    $(this.locationId).off('click');
+  }
 }

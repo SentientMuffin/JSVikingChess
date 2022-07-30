@@ -1,5 +1,10 @@
 class GameState {
   constructor() {
+    this.KingClassName = 'kingUnit';
+    this.EscapeZones = [];
+  }
+
+  initGameState() {
     this.turn = null;
     this.nonTurn = null;
     this.SIDES = { 
@@ -15,9 +20,8 @@ class GameState {
       } 
     }; 
     this.King = null;
-    this.KingClassName = 'kingUnit';
-    this.EscapeZones = [];
     this.Selection = { Selected: false, Unit: null };
+    $("#vikinggame").empty();
   }
 
   placePieces() {
@@ -104,7 +108,25 @@ class GameState {
     this.Selection.Unit = null;
   }
 
+  boardSetup() {
+    let game = $('#vikinggame');
+
+    let gameCellTemplate = $('#templates').find('#game_cell_template');
+    let gameRowTemplate = $('#templates').find('#game_row_template');
+
+    for (let row = 1; row <= boardHeight; row++) {
+      let gameRow = $(gameRowTemplate).clone().attr('id', 'row_' + row);
+      $(game).append(gameRow);
+      for (let column = 1; column <= boardWidth; column++) {
+        let gameCell = $(gameCellTemplate).clone().attr('id', column + '_' + row);
+        $(game).find('#row_' + row).append(gameCell);
+      }
+    }
+  }
+
   start() {
+    this.initGameState();
+    this.boardSetup();
     this.turn = this.SIDES.Vikings;
     this.nonTurn = this.SIDES.Kings;
     this.placePieces();
@@ -162,6 +184,20 @@ class GameState {
     if (win) {
       console.log("Win condition reached!");
       // TODO: implement game reset and win text
+      this.endGame(); 
     }
   }
+
+  endGame() {
+    for (let unit of this.SIDES.Kings.Units) {
+      unit.disable();
+    } 
+
+    for (let unit of this.SIDES.Vikings.Units) {
+      unit.disable();
+    }
+    this.start(); 
+    // this.gameCompleteUI();
+  }
+
 }
