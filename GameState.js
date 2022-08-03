@@ -7,50 +7,50 @@ class GameState {
   initGameState() {
     this.turn = null;
     this.nonTurn = null;
-    this.SIDES = { 
-      Vikings: { 
-        id: 'v', 
-        Units: [], 
-        className: 'vikingsUnit'
-      }, 
-      Kings: { 
-        id: 'k', 
-        Units: [], 
-        className: 'kingsUnit'
-      } 
-    }; 
+    this.SIDES = {
+      Vikings: {
+        id: 'v',
+        Units: [],
+        className: 'vikingsUnit',
+      },
+      Kings: {
+        id: 'k',
+        Units: [],
+        className: 'kingsUnit',
+      },
+    };
     this.King = null;
-    this.Selection = { Selected: false, Unit: null };
-    $("#vikinggame").empty();
+    this.Selection = {Selected: false, Unit: null};
+    $('#vikinggame').empty();
   }
 
   placePieces() {
     // King side
-    let kingLocation = this.placePiece(SETTINGS.kingInitialLocation, 'king.svg');
+    const kingLocation = this.placePiece(SETTINGS.kingInitialLocation, 'king.svg');
     this.King = new GameUnit(this.SIDES.Kings.id, kingLocation, true);
     this.SIDES.Kings.Units.push(this.King);
 
-    for(let loc of SETTINGS.kingSideInitialLocation) {
-      let unitLocation = this.placePiece(loc, 'knight.svg');
+    for (const loc of SETTINGS.kingSideInitialLocation) {
+      const unitLocation = this.placePiece(loc, 'knight.svg');
       this.SIDES.Kings.Units.push(new GameUnit(this.SIDES.Kings.id, unitLocation));
-    } 
+    }
 
     // Viking side
-    for (let loc of SETTINGS.vikingSideInitialLocation) {
-      let unitLocation = this.placePiece(loc, 'viking.svg');
+    for (const loc of SETTINGS.vikingSideInitialLocation) {
+      const unitLocation = this.placePiece(loc, 'viking.svg');
       this.SIDES.Vikings.Units.push(new GameUnit(this.SIDES.Vikings.id, unitLocation));
     }
 
     // Escape zone
-    for (let loc of SETTINGS.escapeZone) {
-      let zoneLocation = markEscapeZone(loc);
+    for (const loc of SETTINGS.escapeZone) {
+      const zoneLocation = markEscapeZone(loc);
       this.EscapeZones.push(new EscapeZone(zoneLocation));
     }
   }
 
   placePiece(location, content) {
-    let gamePieceClone = $('#templates').find('#game_piece_template').clone();
-    let id = locationToID(location);
+    const gamePieceClone = $('#templates').find('#game_piece_template').clone();
+    const id = locationToID(location);
 
     $(gamePieceClone).removeAttr('id');
     $(gamePieceClone).attr('src', content);
@@ -69,32 +69,32 @@ class GameState {
 
   refreshBoard() {
     // Disable all non turn units
-    for (let unit of this.nonTurn.Units) {
+    for (const unit of this.nonTurn.Units) {
       unit.updateGrid();
       unit.updateUnitClass(this.turn.id);
     }
 
     // Highlight moveable units
     // add onclick events to each moveable unit
-    for (let unit of this.turn.Units) {
+    for (const unit of this.turn.Units) {
       unit.updateGrid();
       unit.updateUnitClass(this.turn.id, clickEvent);
     }
   }
 
   static traversable(unit, locationXY) {
-    if ($(locationToID(locationXY)).hasClass('Unit')) return false; 
+    if ($(locationToID(locationXY)).hasClass('Unit')) return false;
     if (!unit.isKing) return !$(locationToID(locationXY)).hasClass('escapeZone');
 
     return true;
   }
 
   releaseUnit(cellId, side) {
-    let unitIndex = side.Units.findIndex(item => item.locationId === cellId);
-    let unit = side.Units[unitIndex];
+    const unitIndex = side.Units.findIndex((item) => item.locationId === cellId);
+    const unit = side.Units[unitIndex];
     side.Units.splice(unitIndex, 1);
-    unit.release();  
-  } 
+    unit.release();
+  }
 
   updateSelection(selectionState, selectedUnit) {
     this.Selection.Selected = selectionState;
@@ -109,16 +109,16 @@ class GameState {
   }
 
   boardSetup() {
-    let game = $('#vikinggame');
+    const game = $('#vikinggame');
 
-    let gameCellTemplate = $('#templates').find('#game_cell_template');
-    let gameRowTemplate = $('#templates').find('#game_row_template');
+    const gameCellTemplate = $('#templates').find('#game_cell_template');
+    const gameRowTemplate = $('#templates').find('#game_row_template');
 
     for (let row = 1; row <= boardHeight; row++) {
-      let gameRow = $(gameRowTemplate).clone().attr('id', 'row_' + row);
+      const gameRow = $(gameRowTemplate).clone().attr('id', 'row_' + row);
       $(game).append(gameRow);
       for (let column = 1; column <= boardWidth; column++) {
-        let gameCell = $(gameCellTemplate).clone().attr('id', column + '_' + row);
+        const gameCell = $(gameCellTemplate).clone().attr('id', column + '_' + row);
         $(game).find('#row_' + row).append(gameCell);
       }
     }
@@ -145,25 +145,27 @@ class GameState {
   }
 
   endTurn() {
-    this.checkWinConditionSatisfied();
-    this.nextTurn();
+    const gameEnded = this.checkWinConditionSatisfied();
+    if (!gameEnded) {
+      this.nextTurn();
+    }
   }
 
   checkVikingWinCondition() {
-    let x = this.King.getLocationXY()[0];
-    let y = this.King.getLocationXY()[1];
+    const x = this.King.getLocationXY()[0];
+    const y = this.King.getLocationXY()[1];
     let surroundCount = 0;
 
     if (x === 1 || x === SETTINGS.boardWidth || y === 1 || y === SETTINGS.boardHeight) {
       surroundCount++;
     }
-    
+
     if (typeMatch([x, y - 1], this.SIDES.Vikings)) surroundCount++;
     if (typeMatch([x, y + 1], this.SIDES.Vikings)) surroundCount++;
     if (typeMatch([x - 1, y], this.SIDES.Vikings)) surroundCount++;
     if (typeMatch([x + 1, y], this.SIDES.Vikings)) surroundCount++;
 
-    return surroundCount == 4; 
+    return surroundCount == 4;
   }
 
   checkKingWinCondition() {
@@ -172,7 +174,7 @@ class GameState {
     }
     return false;
   }
-  
+
   checkWinConditionSatisfied() {
     let win = null;
     if (this.turn === this.SIDES.Vikings) {
@@ -182,22 +184,36 @@ class GameState {
     }
 
     if (win) {
-      console.log("Win condition reached!");
+      console.log('Win condition reached!');
       // TODO: implement game reset and win text
-      this.endGame(); 
+      this.endGame();
+      return true;
     }
+    return false;
   }
 
   endGame() {
-    for (let unit of this.SIDES.Kings.Units) {
-      unit.disable();
-    } 
-
-    for (let unit of this.SIDES.Vikings.Units) {
+    console.log(this.SIDES.Kings.Units);
+    for (const unit of this.SIDES.Kings.Units) {
       unit.disable();
     }
-    this.start(); 
-    // this.gameCompleteUI();
+
+    console.log(this.SIDES.Vikings.Units);
+    for (const unit of this.SIDES.Vikings.Units) {
+      unit.disable();
+    }
+    // this.start();
+    this.gameCompleteUI();
   }
 
+  gameCompleteUI() {
+    $('#gameComplete').removeClass('hidden');
+    $('#newGame').removeClass('hidden');
+    $('#newGame').on('click', this, function() {
+      $('#gameComplete').addClass('hidden');
+      $('#newGame').addClass('hidden');
+      $('#newGame').off('click');
+      gameState.start();
+    });
+  }
 }

@@ -17,6 +17,10 @@ div * {
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 #turn {
   max-width: 451px;
   max-height: 30px;
